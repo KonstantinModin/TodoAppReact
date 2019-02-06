@@ -1,0 +1,15 @@
+.todo-app {
+    margin: 2rem auto 0 auto;
+    max-width: 400px;
+  }
+  
+  .top-panel {
+    margin: 1rem 0;
+  }
+
+.copyright {
+    opacity: .3;
+    margin-top: 30px;
+    text-align: center;
+    
+}
