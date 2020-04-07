@@ -1,6 +1,8 @@
 # Todo App made with React
 
-Simplest todo app made with React
+Simple todo app made with React
+Store data in LocalStorage
+
 
 ## Authors
 
@@ -11,8 +13,8 @@ Simplest todo app made with React
 
 ## Version History
 
-* 0.1
-    * Initial Release
+* 0.2 All data is also stored in LocalStorage
+* 0.1 Initial Release
 	
 ## This project on web
 

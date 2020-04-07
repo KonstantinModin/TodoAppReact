@@ -1,127 +1,102 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import AppHeader from '../app-header';
-import SearchPanel from '../search-panel';
-import TodoList from '../todo-list';
-import ItemStatusFilter from '../item-status-filter';
-import ItemAddForm from '../item-add-form/';
+import AppHeader from "../app-header";
+import SearchPanel from "../search-panel";
+import TodoList from "../todo-list";
+import ItemStatusFilter from "../item-status-filter";
+import ItemAddForm from "../item-add-form/";
 
-import './app.css';
+import "./app.css";
 
 export default class App extends Component {
-
     maxId = 100;
-
     state = {
-        todoData: [
-            this.createTodoItem('Call to Fernando'),
-            this.createTodoItem('Repair car'),
-            this.createTodoItem('Talk with AJ')            
-        ],
-        term: '',
-        button: 'All'
+        todoData: [],
+        term: "",
+        button: "All",
     };
+
+    componentDidMount() {
+        const getLocalStorage = JSON.parse(localStorage.getItem("arr")) || [];
+        this.setState({ todoData: getLocalStorage });
+    }
+
+    updateLocalStorage(todoData) {
+        localStorage.setItem("arr", JSON.stringify(todoData));
+    }
 
     createTodoItem(label) {
         return {
-           label,
-           important: false,
-           done: false,
-           id: this.maxId++
-        }
+            label,
+            important: false,
+            done: false,
+            id: ++this.maxId * Math.random(),
+        };
     }
 
     deleteItem = (id) => {
         this.setState(({ todoData }) => {
-            return {
-                todoData: todoData.filter((el) => el.id !== id) 
-            };
-            
-            
-            
-            
-            // const idx = todoData.findIndex((el) => el.id === id);
-            
-            // const newArray = [
-            //     ...todoData.slice(0, idx),
-            //     ...todoData.slice(idx + 1)
-            // ];
-
-            // return {
-            //     todoData: newArray
-            // };
+            const newArr = todoData.filter((el) => el.id !== id);
+            this.updateLocalStorage(newArr);
+            return { todoData: newArr };
         });
     };
 
     addItem = (text) => {
-       const newItem = this.createTodoItem(text);
+        const newItem = this.createTodoItem(text);
 
-       this.setState(({ todoData }) => {
-            const newArr = [
-                ...todoData,
-                newItem
-            ]
-    
-            return {
-                todoData: newArr
-            };
-       });       
+        this.setState(({ todoData }) => {
+            const newArr = [...todoData, newItem];
+            this.updateLocalStorage(newArr);
+            return { todoData: newArr };
+        });
     };
-        
-    search(items, term, button) {        
+
+    search(items, term, button) {
         let buttonArr = [];
         switch (button) {
-            case 'Active': 
+            case "Active":
                 buttonArr = items.filter((item) => !item.done);
                 break;
-            case 'Done': 
+            case "Done":
                 buttonArr = items.filter((item) => item.done);
                 break;
-            default: 
-                buttonArr = items;           
+            default:
+                buttonArr = items;
         }
-       if (term === "") return buttonArr
-       return buttonArr.filter((item) => item.label.toLowerCase().indexOf(term.toLowerCase()) > -1);
-    };
-    
+        if (term === "") return buttonArr;
+        return buttonArr.filter(
+            (item) => ~item.label.toLowerCase().indexOf(term.toLowerCase())
+        );
+    }
 
     toggleProperty(arr, id, propName) {
         const idx = arr.findIndex((el) => el.id === id);
         const oldItem = arr[idx];
-        const newItem = {...oldItem, [propName]: !oldItem[propName]};
+        const newItem = { ...oldItem, [propName]: !oldItem[propName] };
 
-        return  [
-            ...arr.slice(0, idx),
-            newItem,
-            ...arr.slice(idx + 1)
-        ];
-    };
+        return [...arr.slice(0, idx), newItem, ...arr.slice(idx + 1)];
+    }
 
     onToggleImportant = (id) => {
         this.setState(({ todoData }) => {
-            return {
-                todoData: this.toggleProperty(todoData, id, 'important')
-            };
+            const newArr = this.toggleProperty(todoData, id, "important");
+            this.updateLocalStorage(newArr);
+            return { todoData: newArr };
         });
     };
-    
+
     onToggleDone = (id) => {
         this.setState(({ todoData }) => {
-            return {
-                todoData: this.toggleProperty(todoData, id, 'done')
-            };
+            const newArr = this.toggleProperty(todoData, id, "done");
+            this.updateLocalStorage(newArr);
+            return { todoData: newArr };
         });
     };
 
-    onSearchChange = (e) => {
-        const term = e.target.value;
-        this.setState( {term} );                    
-    };
-
-    onstatusButtonClick = (e) => {
-        const button = e.target.innerHTML;
-        this.setState( {button} );        
-    }
+    onSearchChange = ({ target: { value } }) => this.setState({ term: value });
+    onstatusButtonClick = ({ target: { innerHTML } }) =>
+        this.setState({ button: innerHTML });
 
     render() {
         const { todoData, term, button } = this.state;
@@ -134,26 +109,25 @@ export default class App extends Component {
             <div className="todo-app">
                 <AppHeader toDo={todoCount} done={doneCount} />
                 <div className="top-panel d-flex">
-                    <SearchPanel 
-                    onSearchChange={ this.onSearchChange } />
+                    <SearchPanel onSearchChange={this.onSearchChange} />
                     <ItemStatusFilter
                         filter={button}
-                        statusButtonClick={ this.onstatusButtonClick } />
-                </div>
-            
-                <TodoList 
-                    todos={ visibleItems } 
-                    onDeleted={ this.deleteItem }
-                    onToggleImportant={ this.onToggleImportant } 
-                    onToggleDone={ this.onToggleDone } 
+                        statusButtonClick={this.onstatusButtonClick}
                     />
-                <ItemAddForm
-                    onItemAdded={ this.addItem }
-                 />
-                <div className="copyright">Copyright © 2019 Konstantin Modin All Rights Reserved. Designed with React</div>
+                </div>
+
+                <TodoList
+                    todos={visibleItems}
+                    onDeleted={this.deleteItem}
+                    onToggleImportant={this.onToggleImportant}
+                    onToggleDone={this.onToggleDone}
+                />
+                <ItemAddForm onItemAdded={this.addItem} />
+                <div className="copyright">
+                    Copyright © 2019 Konstantin Modin All Rights Reserved.
+                    Designed with React
+                </div>
             </div>
         );
     }
-    
-};
-
+}
