@@ -1,11 +1,14 @@
-import React from 'react';
-import './search-panel.css';
+import React from "react";
+import "./search-panel.css";
 
-const SearchPanel = ({ onSearchChange, term }) => 
-    <input type="text"
+const SearchPanel = ({ onSearchChange, term }) => (
+    <input
+        type="text"
         className="form-control search-input"
         placeholder="type to search"
-        value={ term } 
-        onChange={ onSearchChange } />
+        value={term}
+        onChange={onSearchChange}
+    />
+);
 
 export default SearchPanel;
